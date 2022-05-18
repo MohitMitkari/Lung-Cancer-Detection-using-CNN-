@@ -1,0 +1,64 @@
+Convolutional Neural Network Code :
+
+
+clc;clear all;close all;
+global net
+ 
+while(1)
+    cc=menu('Lungs Cancer Classification',...
+        'Train the dataset',...
+        'Processing and classification',...
+        'Exit');
+    if(cc==3)
+        break;
+    end
+        
+    if(cc==1) 
+        
+            dataset = 'D:\DIGITAL COMMUNICATIONS TOPICS\Lung Cancer Detection\Source Code\dataset';
+            imds = imageDatastore(dataset, ...
+                'IncludeSubfolders',true, ...
+                'LabelSource','foldernames');
+            labelCount = countEachLabel(imds);
+            numTrainFiles =51;
+            inputSize=[256 256 3];
+            [imdsTrain,imdsValidation] = splitEachLabel(imds,numTrainFiles,'randomize');
+            imdsTrain=augmentedImageDatastore(inputSize, imdsTrain);
+ 
+            layer = [
+                imageInputLayer([256 256 3])
+                convolution2dLayer(3,8,'Padding','same')
+ 
+                 batchNormalizationLayer
+                 reluLayer
+                 maxPooling2dLayer(2,'Stride',2)
+                 convolution2dLayer(3,16,'Padding','same')
+ 
+                 batchNormalizationLayer
+                 reluLayer
+ 
+                maxPooling2dLayer(2,'Stride',2)
+                convolution2dLayer(3,32,'Padding','same')
+ 
+                 batchNormalizationLayer
+                 reluLayer
+ 
+                maxPooling2dLayer(2,'Stride',2)
+ 
+                fullyConnectedLayer(3)
+                softmaxLayer
+                classificationLayer];
+ 
+            options = trainingOptions('sgdm', ...
+                'InitialLearnRate',0.01, ...
+                'MaxEpochs',30);
+ 
+            net = trainNetwork(imdsTrain,layer,options);
+            
+    end  
+    if(cc==2)
+        Lung_Cancer
+    end
+end
+
+
